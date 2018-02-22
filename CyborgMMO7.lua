@@ -71,6 +71,7 @@ function CyborgMMO_MiniMapButtonOnUpdate()
 	CyborgMMO_MiniMapButtonReposition(angle)
 end
 
+
 function CyborgMMO_MouseModeChange(mode)
 	local MiniMapTexture = CyborgMMO_MiniMapButtonIcon
 	local MiniMapGlowTexture = CyborgMMO_MiniMapButtonIconGlow
@@ -106,9 +107,9 @@ function CyborgMMO_SetRatSaveData(objects)
 	assert(VarsLoaded)
 	local specIndex
 	if Settings.PerSpecBindings then
-		specIndex = GetActiveSpecGroup()
+		specIndex = GetSpecialization()
 	else
-		specIndex = 1
+		specIndex = 0
 	end
 	local ratData = {}
 	for mode=1,RAT7.MODES do
@@ -127,103 +128,13 @@ end
 function CyborgMMO_GetRatSaveData()
 	local specIndex
 	if Settings.PerSpecBindings then
-		specIndex = GetActiveSpecGroup()
+		specIndex = GetSpecialization()
 	else
-		specIndex = 1
+		specIndex = 0
 	end
-	CyborgMMO_DPrint("returning rat data for spec:", specIndex, GetActiveSpecGroup())
+	CyborgMMO_DPrint("returning rat data for spec:", specIndex, GetSpecialization())
 	local saveData = CyborgMMO_GetSaveData()
 	return saveData.Rat and saveData.Rat[specIndex]
-end
-
-local function GetSpellID(name)
-	local link = GetSpellLink(name)
-	if link then
-		local id = link:match('spell:(%d+)|')
-		if id then
-			return tonumber(id)
-		end
-	end
-end
-
-local KnownOldObjectTypes = {
-	item = true,
-	macro = true,
-	spell = true,
-	petaction = true,
-	merchant = true,
-	companion = true,
-	equipmentset = true,
-	callback = true,
-}
-
-local function ConvertOldRatData(oldData)
-	local newData = {}
-	for mode,modeData in ipairs(oldData) do
-		newData[mode] = {}
-		for button,buttonData in ipairs(modeData) do
-			CyborgMMO_DPrint("converting mode:", mode, "button:", button)
-			local type = buttonData.Type
-			if type=='item' then
-				-- not possible, the WowObject 'Type' field was overwritten by the item type
-			elseif type=='macro' then
-				local name = buttonData.Name
-				newData[mode][button] = {
-					type = type,
-					detail = name,
-				}
-			elseif type=='spell' then
-				local id = GetSpellID(buttonData.Name)
-				CyborgMMO_DPrint("converting spell:", buttonData.Name, id)
-				if id then
-					newData[mode][button] = {
-						type = type,
-						detail = id,
-					}
-				end
-			elseif type=='petaction' then
-				-- no longer supported
-			elseif type=='merchant' then
-				-- no longer supported
-			elseif type=='companion' then
-				local id = GetSpellID(buttonData.Name)
-				CyborgMMO_DPrint("converting companion:", buttonData.Name, id)
-				if id then
-					newData[mode][button] = {
-						type = type,
-						detail = buttonData.Subdetail,
-						subdetail = id,
-					}
-				end
-			elseif type=='equipmentset' then
-				CyborgMMO_DPrint("converting equipment set:", buttonData.Detail)
-				newData[mode][button] = {
-					type = type,
-					detail = buttonData.Detail,
-				}
-			elseif type=='callback' then
-				CyborgMMO_DPrint("converting callback:", buttonData.Detail)
-				newData[mode][button] = {
-					type = type,
-					detail = buttonData.Detail,
-				}
-			elseif not KnownOldObjectTypes[type] then
-				-- maybe it's an item type
-				local id = buttonData.Detail
-				local class = select(6, GetItemInfo(id)) -- :NOTE: this may fail if the item is not yet in the cache
-				if class == type then
-					CyborgMMO_DPrint("converting item:", id, type, class)
-					newData[mode][button] = {
-						type = "item",
-						detail = id,
-					}
-				end
-			else
-				CyborgMMO_DPrint("cannot convert:", type)
-			end
-		end
-	end
-	return newData
 end
 
 ------------------------------------------------------------------------------
@@ -294,23 +205,6 @@ local function PreLoad(data)
 			end
 		end
 	end
-	-- gather IDs from old unconverted data (in case we need to convert it)
-	if data[SaveName] and data[SaveName].Rat then
-		for mode=1,RAT7.MODES do
-			for button=1,RAT7.BUTTONS do
-				local data = data[SaveName].Rat[mode][button]
-				if data then
-					-- items actually had their class overwrite the Type field
-					if not KnownOldObjectTypes[data.Type] and type(data.Detail)=='number' then
-						local itemID = data.Detail
-						if not GetItemInfo(itemID) then
-							itemIDs[itemID] = true
-						end
-					end
-				end
-			end
-		end
-	end
 
 	-- create frame for regular updates
 	PreloadFrame = CreateFrame("Frame")
@@ -331,23 +225,9 @@ function CyborgMMO_Event(event, ...)
 		if not CyborgMMO7SaveData then
 			CyborgMMO7SaveData = {}
 		end
-		-- cleanup the local mount cache
-		for mount in pairs(CyborgMMO_MountMap) do
-			CyborgMMO_LocalMountMap[mount] = nil
-		end
 		PreLoad(CyborgMMO7SaveData)
 	elseif event == "CYBORGMMO_ASYNC_DATA_LOADED" then
 		AsyncDataLoaded = true
-		-- convert old profile
-		if CyborgMMO7SaveData[SaveName] and not CyborgMMO7SaveData.Settings then
-			local oldData = CyborgMMO7SaveData[SaveName]
-			CyborgMMO7SaveData = {}
-			CyborgMMO7SaveData.Settings = oldData.Settings
-			-- Rat is an array, with one child per talent spec/group
-			CyborgMMO7SaveData.Rat = {}
-			CyborgMMO7SaveData.Rat[1] = ConvertOldRatData(oldData.Rat)
-			CyborgMMO7SaveData[SaveName] = oldData -- for now keep the data, we may have missed something in the conversion
-		end
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		EnteredWorld = true
 	elseif event == "PLAYER_REGEN_DISABLED" then
@@ -403,8 +283,6 @@ function CyborgMMO_Event(event, ...)
 		CyborgMMO_MiniMapButtonReposition(Settings.MiniMapButtonAngle)
 		CyborgMMO_SetCyborgHeadButton(Settings.CyborgButton)
 		CyborgMMO_SetPerSpecBindings(Settings.PerSpecBindings)
-
-		-- assume we start with mode 1, it's the most likely
 		CyborgMMO_MouseModeChange(1)
 
 		SettingsLoaded = true

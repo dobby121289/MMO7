@@ -125,10 +125,10 @@ local function WowItem(itemID)
 	return self
 end
 
+
 function WowItem_methods:Pickup()
 --	PlaySound("igAbilityIconDrop")
 	ClearCursor()
---	SetCursor(self.texture)
 	return PickupItem(self.itemID)
 end
 
@@ -165,8 +165,6 @@ end
 function WowSpell_methods:Pickup()
 --	PlaySound("igAbilityIconDrop")
 	ClearCursor()
---	SetCursor(self.texture)
---	return PickupSpellBookItem(self.SpellbookID, self.Spellbook)
 	return PickupSpell(self.spellID)
 end
 
@@ -205,7 +203,6 @@ end
 function WowMacro_methods:Pickup()
 --	PlaySound("igAbilityIconDrop")
 	ClearCursor()
---	SetCursor(self.texture)
 	return PickupMacro(self.name)
 end
 
@@ -219,7 +216,8 @@ local WowEquipmentSet_methods = setmetatable({}, {__index=WowObject_methods})
 local WowEquipmentSet_mt = {__index=WowEquipmentSet_methods}
 
 local function WowEquipmentSet(name)
-	local texture = GetEquipmentSetInfoByName(name)
+	local _,texture = GetEquipmentSetInfoByName(name)
+	--local name,texture = C_EquipmentSet.GetEquipmentSetInfo(name)    This may be needed when the former call is removed (soon)
 	if not texture then
 		return nil
 	end
@@ -227,7 +225,7 @@ local function WowEquipmentSet(name)
 	local self = WowObject("equipmentset", name)
 
 	self.name = name
-	self.texture = "Interface\\Icons\\"..texture
+	self.texture = texture
 
 	setmetatable(self, WowEquipmentSet_mt)
 
@@ -241,7 +239,6 @@ end
 function WowEquipmentSet_methods:Pickup()
 --	PlaySound("igAbilityIconDrop")
 	ClearCursor()
---	SetCursor(self.texture)
 	return PickupEquipmentSetByName(self.name)
 end
 
@@ -256,37 +253,31 @@ local WowBattlePet_methods = setmetatable({}, {__index=WowObject_methods})
 local WowBattlePet_mt = {__index=WowBattlePet_methods}
 
 local function WowBattlePet(petID)
-	local texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
-	if not texture then
-		return nil
-	end
-
-	local self = WowObject("battlepet", petID)
-	CyborgMMO_DPrint("creating battle pet binding:", petID)
-
-	self.petID = petID
-	self.texture = texture
-
-	setmetatable(self, WowBattlePet_mt)
-
-	return self
-end
-
---[[
-local function IdentifyPet(petID)
-	local creatureID = select(11, C_PetJournal.GetPetInfoByPetID(petID))
-	for index=1,GetNumCompanions('CRITTER') do
-		local creatureID2,_,spellID = GetCompanionInfo('CRITTER', index)
-		if creatureID2 == creatureID then
-			return spellID
+	if event == "PLAYER_ENTERING_WORLD" then
+		if petID == 0xFFFFFFF then
+		return 0,"Interface/ICONS/SUMMON_RANDOM_FAVORITE_BATTLE_PET"
+	end	
+		local texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
+		if not texture then
+			return nil
 		end
+
+		local self = WowObject("battlepet", petID)
+		CyborgMMO_DPrint("creating battle pet binding:", petID)
+
+		self.petID = petID
+		self.texture = texture
+
+		setmetatable(self, WowBattlePet_mt)
+
+		return self
 	end
 end
---]]
 
 function WowBattlePet_methods:DoAction()
 --	PlaySound("igMainMenuOptionCheckBoxOn")
 	C_PetJournal.SummonPetByGUID(self.petID)
+-- if random: C_PetJournal.SummonRandomPet(1)
 end
 
 function WowBattlePet_methods:Pickup()
@@ -304,52 +295,27 @@ end
 local function GetMountInfoEx(mountID)
 	-- special case for random mount
 	if mountID == 0xFFFFFFF then
-		return 0,"Interface/ICONS/ACHIEVEMENT_GUILDPERK_MOUNTUP"
-	end
+		return 0,"Interface/ICONS/ACHIEVEMENT_GUILDPERK_MOUNTUP",0
+	end	
+	local mI = nil
+	local _,spell,texture = C_MountJournal.GetMountInfoByID(mountID)
 	
-	local spellID = CyborgMMO_MountMap[mountID] or CyborgMMO_LocalMountMap[mountID]
-	if not spellID then return nil,"not in database" end
-	
-	local mountIndex
-	for i=1,C_MountJournal.GetNumMounts() do
-		local _,spell,texture = C_MountJournal.GetMountInfo(i) -- :FIXME: this may fail too early in the session (like when loading saved data)
+	for i=1, C_MountJournal.GetNumMounts() do
+		local _,spellID = C_MountJournal.GetDisplayedMountInfo(i)
 		if spell==spellID then
-			return i,texture
+			 mI = i
 		end
 	end
 	
-	return nil,"not in journal"
-end
-
-local function FindMountFromSpellID(spellID)
-	for mount,spell in pairs(CyborgMMO_MountMap) do
-		if spell==spellID then
-			return mount
-		end
-	end
-	for mount,spell in pairs(CyborgMMO_MountMap) do
-		if spell==spellID then
-			return mount
-		end
-	end
-	for i=1,C_MountJournal.GetNumMounts() do
-		local _,spell = C_MountJournal.GetMountInfo(i)
-		if spell==spellID then
-			local cursor = pack(GetCursorInfo())
-			C_MountJournal.Pickup(i)
-			local _,mountID = GetCursorInfo()
-			ClearCursor()
-			return mountID
-		end
-	end
-	return nil
+	
+	return mountID,texture, mI
 end
 
 local WowMount_methods = setmetatable({}, {__index=WowObject_methods})
 local WowMount_mt = {__index=WowMount_methods}
 
 local function WowMount(mountID)
-	local mountIndex,texture = GetMountInfoEx(mountID)
+	local mountIndex,texture, mI = GetMountInfoEx(mountID)
 	if not mountIndex then
 		-- the mount might have been removed from the game
 		return nil
@@ -360,6 +326,7 @@ local function WowMount(mountID)
 
 	self.mountID = mountID
 	self.texture = texture
+	self.mI = mI
 
 	setmetatable(self, WowMount_mt)
 
@@ -370,11 +337,11 @@ function WowMount_methods:DoAction()
 	local mountIndex = GetMountInfoEx(self.mountID)
 	if not mountIndex then return end
 	
-	C_MountJournal.Summon(mountIndex)
+	C_MountJournal.SummonByID(mountIndex)
 end
 
 function WowMount_methods:Pickup()
-	local mountIndex = GetMountInfoEx(self.mountID)
+	local mountIndex = GetMountInfoEx(self.mI)
 	if not mountIndex then return end
 	
 	return C_MountJournal.Pickup(mountIndex)
@@ -395,7 +362,6 @@ CyborgMMO_CallbackIcons = {
 		self.relativePoint,
 		self.xOfs,
 		self.yOfs = self:GetPoint()
-	--	self:SetPoint(self.point, self.relativeTo, self.relativePoint, self.xOfs, self.yOfs)
 		self.strata = self:GetFrameStrata()
 		self.wowObject = WowCallback(string.gsub(self:GetName(), self:GetParent():GetName(), "",1))
 		self.wowObject:SetTextures(self)
@@ -440,13 +406,6 @@ function CyborgMMO_CreateWowObject(type, ...)
 		object = WowMacro(...)
 	elseif type == "spell" then
 		object = WowSpell(...)
-	elseif type == "companion" then
-		-- most likely a legacy mount in an old SavedVariables
-		local spellID = ...
-		local mountID = FindMountFromSpellID(spellID)
-		if mountID then
-			object = WowMount(mountID)
-		end
 	elseif type == "equipmentset" then
 		object = WowEquipmentSet(...)
 	elseif type == "battlepet" then

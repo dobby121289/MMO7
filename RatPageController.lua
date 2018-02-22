@@ -25,7 +25,6 @@ local RatPageController_mt = {__index=RatPageController_methods}
 
 local function RatPageController()
 	local self = {}
---	CyborgMMO_RatPageModel:SetMode(1)
 	setmetatable(self, RatPageController_mt)
 	return self
 end
@@ -47,37 +46,7 @@ end
 
 function RatPageController_methods:GetCursorObject()
 	local type,a,b,c = GetCursorInfo()
-	ClearCursor()
-	
-	-- special case for unknown mounts (do it here since we're sure the cursor is free)
-	if type=='mount' then
-		local mountID = a
-		-- if the mount is unknown
-		if mountID~=0xFFFFFFF and not CyborgMMO_MountMap[mountID] and not CyborgMMO_LocalMountMap[mountID] then
-			-- build a reverse index of known mount spells
-			local reverse = {}
-			for mount,spell in pairs(CyborgMMO_MountMap) do reverse[spell] = mount end
-			for mount,spell in pairs(CyborgMMO_LocalMountMap) do reverse[spell] = mount end
-			-- iterate over mount journal
-			for i=1,C_MountJournal.GetNumMounts() do
-				local _,spell = C_MountJournal.GetMountInfo(i)
-				-- if the mount has no known mount ID
-				if not reverse[spell] then
-					-- pickup the mount
-					C_MountJournal.Pickup(i)
-					-- get the mount id from the cursor
-					local _,mount = GetCursorInfo()
-					ClearCursor()
-					-- save that to avoid spamming the cursor too often
-					if mount then
-						CyborgMMO_LocalMountMap[mount] = spell
-						reverse[spell] = mount
-					end
-				end
-			end
-		end
-	end
-	
+	ClearCursor()	
 	if type=='item' then
 		local id,link = a,b
 		return CyborgMMO_CreateWowObject('item', id)
@@ -97,8 +66,6 @@ function RatPageController_methods:GetCursorObject()
 	elseif type=='equipmentset' then
 		local name = a
 		return CyborgMMO_CreateWowObject('equipmentset', name)
-	elseif type=='petaction' then
-		return nil
 	elseif type=='money' then
 		return nil
 	elseif type=='merchant' then
