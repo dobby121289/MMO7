@@ -253,25 +253,25 @@ local WowBattlePet_methods = setmetatable({}, {__index=WowObject_methods})
 local WowBattlePet_mt = {__index=WowBattlePet_methods}
 
 local function WowBattlePet(petID)
-	if event == "PLAYER_ENTERING_WORLD" then
-		if petID == 0xFFFFFFF then
+	--if event == "PLAYER_ENTERING_WORLD" then
+	if petID == 0xFFFFFFF then
 		return 0,"Interface/ICONS/SUMMON_RANDOM_FAVORITE_BATTLE_PET"
 	end	
-		local texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
-		if not texture then
-			return nil
-		end
-
-		local self = WowObject("battlepet", petID)
-		CyborgMMO_DPrint("creating battle pet binding:", petID)
-
-		self.petID = petID
-		self.texture = texture
-
-		setmetatable(self, WowBattlePet_mt)
-
-		return self
+	local texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
+	if not texture then
+		return nil
 	end
+
+	local self = WowObject("battlepet", petID)
+	CyborgMMO_DPrint("creating battle pet binding:", petID)
+
+	self.petID = petID
+	self.texture = texture
+
+	setmetatable(self, WowBattlePet_mt)
+
+	return self
+	--end
 end
 
 function WowBattlePet_methods:DoAction()
