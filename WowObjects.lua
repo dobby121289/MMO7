@@ -261,7 +261,7 @@ local function WowBattlePet(petID)
 	self.petID = petID
 	
 	if petID == 'BattlePet-0-FFFFFFFFFFFFFF' then
-		texture = "Interface/ICONS/ACHIEVEMENT_GUILDPERK_MOUNTUP"
+		texture = "Interface/ICONS/PetJournalPortrait"
 		--return 0,"Interface/ICONS/SUMMON_RANDOM_FAVORITE_BATTLE_PET"
 	else	
 		texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
