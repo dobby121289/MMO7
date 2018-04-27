@@ -134,6 +134,7 @@ end
 
 function WowItem_methods:SetBinding(key)
 	local name = GetItemInfo(self.itemID)
+	CyborgMMO_DPrint("binding item:", self.itemID, name)
 	SetOverrideBindingItem(CyborgMMO_CallbackFactory.Frame, true, key, name)
 end
 
@@ -253,31 +254,35 @@ local WowBattlePet_methods = setmetatable({}, {__index=WowObject_methods})
 local WowBattlePet_mt = {__index=WowBattlePet_methods}
 
 local function WowBattlePet(petID)
-	--if event == "PLAYER_ENTERING_WORLD" then
-	if petID == 0xFFFFFFF then
-		return 0,"Interface/ICONS/SUMMON_RANDOM_FAVORITE_BATTLE_PET"
-	end	
-	local texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
+	local texture
+	local self
+	CyborgMMO_DPrint("creating battle pet binding:", petID)
+	self = WowObject("battlepet", petID)
+	self.petID = petID
+	
+	if petID == 'BattlePet-0-FFFFFFFFFFFFFF' then
+		texture = "Interface/ICONS/ACHIEVEMENT_GUILDPERK_MOUNTUP"
+		--return 0,"Interface/ICONS/SUMMON_RANDOM_FAVORITE_BATTLE_PET"
+	else	
+		texture = select(9, C_PetJournal.GetPetInfoByPetID(petID)) -- :FIXME: this may fail too early in the session (like when loading saved data)
+	end
+	
 	if not texture then
 		return nil
 	end
 
-	local self = WowObject("battlepet", petID)
-	CyborgMMO_DPrint("creating battle pet binding:", petID)
-
-	self.petID = petID
 	self.texture = texture
-
-	setmetatable(self, WowBattlePet_mt)
-
+	setmetatable(self, WowBattlePet_mt)	
 	return self
-	--end
 end
 
 function WowBattlePet_methods:DoAction()
 --	PlaySound("igMainMenuOptionCheckBoxOn")
-	C_PetJournal.SummonPetByGUID(self.petID)
--- if random: C_PetJournal.SummonRandomPet(1)
+	if self.petID == 'BattlePet-0-FFFFFFFFFFFFFF' then
+		C_PetJournal.SummonRandomPet(1)
+	else
+		C_PetJournal.SummonPetByGUID(self.petID)
+	end
 end
 
 function WowBattlePet_methods:Pickup()

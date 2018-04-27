@@ -147,7 +147,7 @@ local function PreloadFrameUpdate(self, dt)
 	self.step_timeout = self.step_timeout - dt
 	self.total_timeout = self.total_timeout - dt
 	if self.step_timeout < 0 then
-		local items,pets = 0,0
+		local items = 0
 		-- check items
 		for itemID in pairs(self.itemIDs) do
 			if GetItemInfo(itemID) then
@@ -156,16 +156,8 @@ local function PreloadFrameUpdate(self, dt)
 				items = items + 1
 			end
 		end
-		-- check pets
-		for petID in pairs(self.petIDs) do
-			if C_PetJournal.GetPetInfoByPetID(petID) then
-				self.petIDs[petID] = nil
-			else
-				pets = pets + 1
-			end
-		end
-		CyborgMMO_DPrint("PreloadFrameUpdate step", self.total_timeout, "items:", items, "pets:", pets)
-		if self.total_timeout < 0 or next(self.itemIDs)==nil and next(self.petIDs)==nil then
+		CyborgMMO_DPrint("PreloadFrameUpdate step", self.total_timeout, "items:", items)
+		if self.total_timeout < 0 or next(self.itemIDs)==nil then
 			-- when done destroy the frame and throw an event for further loading
 			self:Hide()
 			self:SetParent(nil)
