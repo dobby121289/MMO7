@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: Cyborg MMO7 Addon
 ## DefaultState: Enabled
 ## Version: v7.0.0
