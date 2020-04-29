@@ -71,7 +71,6 @@ function CyborgMMO_MiniMapButtonOnUpdate()
 	CyborgMMO_MiniMapButtonReposition(angle)
 end
 
-
 function CyborgMMO_MouseModeChange(mode)
 	local MiniMapTexture = CyborgMMO_MiniMapButtonIcon
 	local MiniMapGlowTexture = CyborgMMO_MiniMapButtonIconGlow
@@ -107,9 +106,9 @@ function CyborgMMO_SetRatSaveData(objects)
 	assert(VarsLoaded)
 	local specIndex
 	if Settings.PerSpecBindings then
-		specIndex = GetSpecialization()
+		specIndex = GetActiveSpecGroup()
 	else
-		specIndex = 0
+		specIndex = 1
 	end
 	local ratData = {}
 	for mode=1,RAT7.MODES do
@@ -128,14 +127,16 @@ end
 function CyborgMMO_GetRatSaveData()
 	local specIndex
 	if Settings.PerSpecBindings then
-		specIndex = GetSpecialization()
+		specIndex = GetActiveSpecGroup()
 	else
-		specIndex = 0
+		specIndex = 1
 	end
-	CyborgMMO_DPrint("returning rat data for spec:", specIndex, GetSpecialization())
+--	CyborgMMO_DPrint("returning rat data for spec:", specIndex, GetActiveSpecGroup())
 	local saveData = CyborgMMO_GetSaveData()
 	return saveData.Rat and saveData.Rat[specIndex]
 end
+
+
 
 ------------------------------------------------------------------------------
 
@@ -147,7 +148,7 @@ local function PreloadFrameUpdate(self, dt)
 	self.step_timeout = self.step_timeout - dt
 	self.total_timeout = self.total_timeout - dt
 	if self.step_timeout < 0 then
-		local items = 0
+		local items,pets = 0,0
 		-- check items
 		for itemID in pairs(self.itemIDs) do
 			if GetItemInfo(itemID) then
@@ -156,8 +157,16 @@ local function PreloadFrameUpdate(self, dt)
 				items = items + 1
 			end
 		end
-		CyborgMMO_DPrint("PreloadFrameUpdate step", self.total_timeout, "items:", items)
-		if self.total_timeout < 0 or next(self.itemIDs)==nil then
+		-- check pets
+		for petID in pairs(self.petIDs) do
+			if C_PetJournal.GetPetInfoByPetID(petID) then
+				self.petIDs[petID] = nil
+			else
+				pets = pets + 1
+			end
+		end
+		CyborgMMO_DPrint("PreloadFrameUpdate step", self.total_timeout, "items:", items, "pets:", pets)
+		if self.total_timeout < 0 or next(self.itemIDs)==nil and next(self.petIDs)==nil then
 			-- when done destroy the frame and throw an event for further loading
 			self:Hide()
 			self:SetParent(nil)
@@ -275,6 +284,8 @@ function CyborgMMO_Event(event, ...)
 		CyborgMMO_MiniMapButtonReposition(Settings.MiniMapButtonAngle)
 		CyborgMMO_SetCyborgHeadButton(Settings.CyborgButton)
 		CyborgMMO_SetPerSpecBindings(Settings.PerSpecBindings)
+
+		-- assume we start with mode 1, it's the most likely
 		CyborgMMO_MouseModeChange(1)
 
 		SettingsLoaded = true
@@ -343,7 +354,11 @@ function CyborgMMO_Open()
 end
 
 function CyborgMMO_IsOpen()
-	return CyborgMMO_MainPage:IsVisible()
+	if CyborgMMO_MainPage:IsVisible() == 1 then
+		return true
+	else
+		return false
+	end
 end
 
 function CyborgMMO_Toggle()

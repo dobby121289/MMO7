@@ -25,6 +25,7 @@ local RatPageController_mt = {__index=RatPageController_methods}
 
 local function RatPageController()
 	local self = {}
+--	CyborgMMO_RatPageModel:SetMode(1)
 	setmetatable(self, RatPageController_mt)
 	return self
 end
@@ -46,26 +47,29 @@ end
 
 function RatPageController_methods:GetCursorObject()
 	local type,a,b,c = GetCursorInfo()
-	ClearCursor()	
+	ClearCursor()
 	if type=='item' then
 		local id,link = a,b
 		return CyborgMMO_CreateWowObject('item', id)
 	elseif type=='spell' then
 		local index,book,id = a,b,c
-		return CyborgMMO_CreateWowObject('spell', id)
+		return CyborgMMO_CreateWowObject('spell', index)
 	elseif type=='macro' then
 		local index = a
 		local name = GetMacroInfo(index)
 		return CyborgMMO_CreateWowObject('macro', name)
+	elseif type=='companion' then
+		local index,subtype = a,b
+		local spellID = select(3, GetCompanionInfo(subtype, index))
+		return CyborgMMO_CreateWowObject('companion', spellID)
 	elseif type=='battlepet' then
 		local petID = a
 		return CyborgMMO_CreateWowObject('battlepet', petID)
-	elseif type=='mount' then
-		local mountID = a
-		return CyborgMMO_CreateWowObject('mount', mountID)
 	elseif type=='equipmentset' then
 		local name = a
 		return CyborgMMO_CreateWowObject('equipmentset', name)
+	elseif type=='petaction' then
+		return nil
 	elseif type=='money' then
 		return nil
 	elseif type=='merchant' then

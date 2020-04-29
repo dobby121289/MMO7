@@ -55,7 +55,7 @@ end
 ------------------------------------------------------------------------------
 
 function callbacks.Map()
-	ToggleWorldMap()
+	ToggleFrame(WorldMapFrame)
 end
 
 function callbacks.CharacterPage()
@@ -75,7 +75,7 @@ function callbacks.Macros()
 end
 
 function callbacks.QuestLog()
-	ToggleQuestLog()
+	ToggleFrame(QuestLogFrame)
 end
 
 function callbacks.Achievement()

@@ -130,19 +130,8 @@
 			</Frame>
 		</Frames>
 		<Scripts>
-			<OnLoad>
-				CyborgMMO_Loaded()
-				self:RegisterForDrag("LeftButton")
-			</OnLoad>
+			<OnLoad>CyborgMMO_Loaded()</OnLoad>
 			<OnEvent>CyborgMMO_Event(event, ...)</OnEvent>
-			<OnDragStart>
-				self:StartMoving()
-				self.isMoving = true
-			</OnDragStart>
-			<OnDragStop>
-				self:StopMovingOrSizing()
-				self.isMoving = false
-			</OnDragStop>
 		</Scripts>
 	</Frame>
 </Ui>

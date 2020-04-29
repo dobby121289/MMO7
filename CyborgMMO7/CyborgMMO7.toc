@@ -1,10 +1,14 @@
-## Interface: 80000
+## Interface: 50400
 ## Title: Cyborg MMO7 Addon
 ## DefaultState: Enabled
-## Version: v7.0.0
+## Version: v5.4.2-1
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: CyborgMMO7SaveData
 ## SavedVariables: CyborgMMO_ProfileKeyBindings
+## X-Curse-Packaged-Version: v5.4.2-1
+## X-Curse-Project-Name: Cyborg MMO7
+## X-Curse-Project-ID: cyborg-mmo7
+## X-Curse-Repository-ID: wow/cyborg-mmo7/mainline
 
 Localisation.lua
 OptionView.lua
