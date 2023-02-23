@@ -22,12 +22,6 @@
 	-->
 
 	<Frame name="CyborgMMO_OpenButtonPage" movable="true" clampedtoscreen="true" enableMouse="true" hidden="true">
-		<TitleRegion>
-			<Size x="75" y="75"/>
-			<Anchors>
-				<Anchor point="TOPLEFT"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
-			</Anchors>
-		</TitleRegion>
 		<Size><AbsDimension x="50" y="50"/></Size>
 		<Anchors>
 			<Anchor point="LEFT" relativeTo="UIParent"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>

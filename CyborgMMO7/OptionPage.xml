@@ -263,6 +263,7 @@
 				<Layers>
 					<Layer>
 						<FontString name="$parentTitle" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateSliderTitle">
+							<FontHeight><AbsValue val="10"/></FontHeight>
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="$parentMiniMapButton">
 									<Offset><AbsDimension x="45" y="0"/></Offset>
@@ -296,6 +297,7 @@
 				<Layers>
 					<Layer>
 						<FontString name="$parentTitle" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateSliderTitle">
+							<FontHeight><AbsValue val="10"/></FontHeight>
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="$parentCyborgButton">
 									<Offset><AbsDimension x="45" y="0"/></Offset>
@@ -328,6 +330,7 @@
 				<Layers>
 					<Layer>
 						<FontString name="$parentTitle" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateSliderTitle">
+							<FontHeight><AbsValue val="10"/></FontHeight>
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="$parentPerSpecBindings">
 									<Offset><AbsDimension x="45" y="0"/></Offset>
@@ -366,26 +369,22 @@
 							<Anchor point="LEFT"/>
 							<Anchor point="RIGHT"/>
 						</Anchors>
-						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
-							<BackgroundInsets>
-								<AbsInset left="3" right="3" top="6" bottom="6"/>
-							</BackgroundInsets>
-							<TileSize><AbsValue val="8"/></TileSize>
-							<EdgeSize><AbsValue val="8"/></EdgeSize>
-						</Backdrop>
 						<Layers>
 							<Layer>
 								<FontString name="$parentTitle" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateSliderTitle">
+									<FontHeight><AbsValue val="10"/></FontHeight>
 									<Anchors>
 										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
 									</Anchors>
 								</FontString>
 								<FontString name="$parentLow" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateNormalString" text="50%">
+									<FontHeight><AbsValue val="10"/></FontHeight>
 									<Anchors>
 										<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"/>
 									</Anchors>
 								</FontString>
 								<FontString name="$parentHigh" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateNormalString" text="100%">
+									<FontHeight><AbsValue val="10"/></FontHeight>
 									<Anchors>
 										<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT"/>
 									</Anchors>
@@ -420,26 +419,22 @@
 							<Anchor point="LEFT"/>
 							<Anchor point="RIGHT"/>
 						</Anchors>
-						<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
-							<BackgroundInsets>
-								<AbsInset left="3" right="3" top="6" bottom="6"/>
-							</BackgroundInsets>
-							<TileSize><AbsValue val="8"/></TileSize>
-							<EdgeSize><AbsValue val="8"/></EdgeSize>
-						</Backdrop>
 						<Layers>
 							<Layer>
 								<FontString name="$parentTitle" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateSliderTitle">
+									<FontHeight><AbsValue val="10"/></FontHeight>
 									<Anchors>
 										<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT"/>
 									</Anchors>
 								</FontString>
 								<FontString name="$parentLow" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateNormalString" text="50%">
+									<FontHeight><AbsValue val="10"/></FontHeight>
 									<Anchors>
 										<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"/>
 									</Anchors>
 								</FontString>
 								<FontString name="$parentHigh" font="Fonts\FRIZQT__.TTF" inherits="CyborgMMO_TemplateNormalString" text="100%">
+									<FontHeight><AbsValue val="10"/></FontHeight>
 									<Anchors>
 										<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT"/>
 									</Anchors>
@@ -505,13 +500,6 @@
 		<Anchors>
 			<Anchor point="CENTER"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
 		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="11" right="12" top="12" bottom="11"/>
-			</BackgroundInsets>
-			<TileSize><AbsValue val="32"/></TileSize>
-			<EdgeSize><AbsValue val="32"/></EdgeSize>
-		</Backdrop>
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="$parentHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
