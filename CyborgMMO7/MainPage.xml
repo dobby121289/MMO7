@@ -41,12 +41,6 @@
 
 	<!-- The Main Form -->
 	<Frame name="CyborgMMO_MainPage" movable="true" enableMouse="true" clampedtoscreen="true" frameStrata="MEDIUM" hidden="true">
-		<TitleRegion>
-			<Size x="512" y="512"/>
-			<Anchors>
-				<Anchor point="LEFT"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
-			</Anchors>
-		</TitleRegion>
 		<Size><AbsDimension x="512" y="512"/></Size>
 		<Anchors>
 			<Anchor point="LEFT" relativeTo="UIParent"><Offset><AbsDimension x="0" y="0"/></Offset></Anchor>
@@ -76,7 +70,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentCharacterPage" inherits="CyborgMMO_TemplateCallbackButton" resize="false">
+			<Button name="$parentCharacterPage" inherits="CyborgMMO_TemplateCallbackButton">
 				<Anchors>
 					<Anchor point="TOPLEFT"><Offset><AbsDimension x="379" y="-411"/></Offset></Anchor>
 				</Anchors>
